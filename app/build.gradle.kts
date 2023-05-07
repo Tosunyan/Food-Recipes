@@ -77,4 +77,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.1.0")
+
+    // Data Store
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }
