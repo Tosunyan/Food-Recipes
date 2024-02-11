@@ -13,4 +13,8 @@ object DataStoreContainer {
     fun init(application: Application) {
         this.application = application
     }
+
+    val applicationPreferences by lazy {
+        ApplicationPreferences(application.dataStore)
+    }
 }

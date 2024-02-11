@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -25,7 +26,10 @@ import com.example.foodRecipes.presentation.recyclerview.holder.MealHolder
 import com.example.foodRecipes.presentation.recyclerview.holder.RegionHolder
 import com.example.foodRecipes.presentation.viewmodel.HomeFragmentViewModel
 import com.example.foodRecipes.util.collect
+import com.example.foodRecipes.util.toFormattedString
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flow
+import kotlin.time.Duration
 
 class HomeFragment : Fragment() {
 
@@ -94,8 +98,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun FragmentHomeBinding.initListeners() {
-        mealItem.root.setOnClickListener {
-            val mealId = viewModel.randomMeal.value?.id ?: return@setOnClickListener
+        dailySpecial.root.setOnClickListener {
+            val mealId = viewModel.dailySpecial.value?.id ?: return@setOnClickListener
             val args = bundleOf(MealDetailsFragment.ARG_ID to mealId)
             navigate(MealDetailsFragment::class, args)
         }
@@ -107,8 +111,12 @@ class HomeFragment : Fragment() {
                 showSnackBar(it)
             }
 
-            randomMeal.filterNotNull().collect(viewLifecycleOwner) {
-                MealHolder(binding!!.mealItem).onBind(it)
+            dailySpecialTimer.collect(viewLifecycleOwner) { duration ->
+                binding?.dailySpecialTimer?.text = duration.toFormattedString(includeDays = false)
+            }
+
+            dailySpecial.filterNotNull().collect(viewLifecycleOwner) {
+                MealHolder(binding!!.dailySpecial).onBind(it)
             }
 
             categories.collect(viewLifecycleOwner) {

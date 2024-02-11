@@ -15,3 +15,7 @@ fun logApiRequest(request: Request) {
 fun logApiResponse(url: HttpUrl, response: ApiResponse<*>) {
     Log.i(ApiResponse::class.simpleName, "{\n\turl=${url},\n\tbody=$response\n}")
 }
+
+fun Any.logInfo(message: String) {
+    Log.i(this::class.simpleName, message)
+}

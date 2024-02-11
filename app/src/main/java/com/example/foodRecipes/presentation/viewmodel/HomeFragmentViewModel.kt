@@ -4,27 +4,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodRecipes.datasource.remote.api.ApiResponse
 import com.example.foodRecipes.datasource.remote.data.RegionDto
-import com.example.foodRecipes.datasource.remote.data.RegionsDto
 import com.example.foodRecipes.domain.model.CategoryModel
 import com.example.foodRecipes.domain.model.MealModel
-import com.example.foodRecipes.domain.repository.HomeRepository
 import com.example.foodRecipes.domain.usecase.GetCategories
+import com.example.foodRecipes.domain.usecase.GetDailySpecial
+import com.example.foodRecipes.domain.usecase.GetDailySpecialDuration
 import com.example.foodRecipes.domain.usecase.GetRegions
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Duration
 
-class HomeFragmentViewModel(
-    private val getCategories: GetCategories = GetCategories,
-    private val getRegions: GetRegions = GetRegions,
-    private val homeRepository: HomeRepository = HomeRepository()
-) : ViewModel() {
+class HomeFragmentViewModel : ViewModel() {
 
-    private val randomMealResponse = MutableSharedFlow<ApiResponse<MealModel?>>()
+    private val dailySpecialResponse = MutableSharedFlow<ApiResponse<MealModel?>>()
     private val categoriesResponse = MutableSharedFlow<ApiResponse<List<CategoryModel>>>()
     private val regionsResponse = MutableSharedFlow<ApiResponse<List<RegionDto>>>()
 
-    val randomMeal = MutableStateFlow<MealModel?>(null)
+    val dailySpecial = MutableStateFlow<MealModel?>(null)
+    val dailySpecialTimer = MutableStateFlow(Duration.ZERO)
+
     val categories = MutableStateFlow<List<CategoryModel>>(emptyList())
     val regions = MutableStateFlow<List<RegionDto>>(emptyList())
 
@@ -36,35 +39,53 @@ class HomeFragmentViewModel(
     }
 
     private fun makeApiCalls() {
-        getRandomMeal()
+        getDailySpecial()
         getCategories()
         getRegions()
     }
 
-    private fun getRandomMeal() {
+    private fun getDailySpecial() {
         viewModelScope.launch {
-            val response = homeRepository.getRandomMeal()
-            randomMealResponse.emit(response)
+            val response = GetDailySpecial.execute()
+            dailySpecialResponse.emit(response)
+
+            getDailySpecialDuration()
+        }
+    }
+
+    private fun getDailySpecialDuration() {
+        viewModelScope.launch {
+            GetDailySpecialDuration.execute().collect { duration ->
+                dailySpecialTimer.value = duration
+            }
         }
     }
 
     private fun getCategories() {
         viewModelScope.launch {
-            val response = getCategories.execute()
+            val response = GetCategories.execute()
             categoriesResponse.emit(response)
         }
     }
 
     private fun getRegions() {
         viewModelScope.launch {
-            val response = getRegions.execute()
+            val response = GetRegions.execute()
             regionsResponse.emit(response)
         }
     }
 
     private fun initObservers() {
         viewModelScope.launch {
-            randomMealResponse.collect(::onRandomMealResponse)
+            dailySpecialResponse.collect(::onDailySpecialResponse)
+        }
+
+        viewModelScope.launch {
+            dailySpecialTimer.collect {
+                if (it == Duration.ZERO) {
+                    getDailySpecial()
+                }
+            }
         }
 
         viewModelScope.launch {
@@ -76,9 +97,9 @@ class HomeFragmentViewModel(
         }
     }
 
-    private fun onRandomMealResponse(response: ApiResponse<MealModel?>) {
+    private fun onDailySpecialResponse(response: ApiResponse<MealModel?>) {
         when (response) {
-            is ApiResponse.Success -> randomMeal.value = response.data
+            is ApiResponse.Success -> dailySpecial.value = response.data
             is ApiResponse.Failure -> showErrorMessage("Failed to fetch today's meal")
         }
     }
