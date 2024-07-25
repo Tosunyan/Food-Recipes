@@ -23,8 +23,6 @@ class SearchFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ) = ProvideThemedContent {
-        viewModel.onSearchInputChange("")
-
         SearchScreen(
             meals = viewModel.meals.collectAsState().value,
             onSearchInputChange = viewModel::onSearchInputChange,

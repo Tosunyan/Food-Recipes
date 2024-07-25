@@ -17,7 +17,10 @@ class SearchViewModel(
     val meals = _meals.asStateFlow()
 
     fun onSearchInputChange(text: String = "") {
-        if (text.trim().isBlank()) return
+        if (text.isBlank()) {
+            clearMeals()
+            return
+        }
 
         searchForMeals(text)
     }
@@ -30,5 +33,9 @@ class SearchViewModel(
                 _meals.value = response.data
             }
         }
+    }
+
+    private fun clearMeals() {
+        _meals.value = emptyList()
     }
 }
