@@ -1,9 +1,8 @@
 package com.example.foodRecipes.domain.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize
+@Serializable
 data class MealDetailsModel(
     val id: String = "",
     val name: String = "",
@@ -14,4 +13,4 @@ data class MealDetailsModel(
     val youtubeUrl: String? = null,
     val sourceUrl: String? = null,
     val ingredients: List<IngredientModel> = emptyList(),
-) : Parcelable
+)

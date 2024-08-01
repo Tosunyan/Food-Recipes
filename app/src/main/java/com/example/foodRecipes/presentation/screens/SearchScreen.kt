@@ -7,16 +7,35 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.foodRecipes.R
 import com.example.foodRecipes.domain.model.MealDetailsModel
+import com.example.foodRecipes.presentation.navigation.NavigationDestination
+import com.example.foodRecipes.presentation.navigation.NavigationManager
 import com.example.foodRecipes.presentation.theme.components.MealDetailsList
+import com.example.foodRecipes.presentation.viewmodel.SearchViewModel
 import com.inconceptlabs.designsystem.components.core.Text
 import com.inconceptlabs.designsystem.components.input.InputForm
 import com.inconceptlabs.designsystem.theme.AppTheme
 import com.inconceptlabs.designsystem.utils.clearFocusOnGesture
+
+@Composable
+fun SearchScreen(
+    navigationManager: NavigationManager,
+    viewModel: SearchViewModel,
+) {
+    SearchScreen(
+        meals = viewModel.meals.collectAsState().value,
+        onSearchInputChange = viewModel::onSearchInputChange,
+        onMealItemClick = {
+            val destination = NavigationDestination.MealDetails(mealDetailsModel = it)
+            navigationManager.navigate(destination)
+        },
+    )
+}
 
 @Composable
 fun SearchScreen(

@@ -1,5 +1,8 @@
 package com.example.foodRecipes.presentation.screens
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,19 +17,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import coil.compose.AsyncImage
 import com.example.foodRecipes.R
 import com.example.foodRecipes.domain.model.IngredientModel
 import com.example.foodRecipes.domain.model.MealDetailsModel
+import com.example.foodRecipes.presentation.navigation.NavigationManager
 import com.example.foodRecipes.presentation.theme.Gray900
 import com.example.foodRecipes.presentation.theme.Orange500
 import com.example.foodRecipes.presentation.theme.Red900
@@ -34,6 +41,7 @@ import com.example.foodRecipes.presentation.theme.components.TextButton
 import com.example.foodRecipes.presentation.theme.components.listitem.IngredientItem
 import com.example.foodRecipes.presentation.theme.indication.ScaleIndicationNodeFactory
 import com.example.foodRecipes.presentation.theme.shimmerBrush
+import com.example.foodRecipes.presentation.viewmodel.MealDetailsViewModel
 import com.inconceptlabs.designsystem.components.buttons.IconButton
 import com.inconceptlabs.designsystem.components.core.Text
 import com.inconceptlabs.designsystem.theme.AppTheme
@@ -41,6 +49,28 @@ import com.inconceptlabs.designsystem.theme.LocalContentColor
 import com.inconceptlabs.designsystem.theme.attributes.CornerType
 import com.inconceptlabs.designsystem.theme.attributes.KeyColor
 import com.inconceptlabs.designsystem.theme.attributes.Size
+
+@Composable
+fun MealDetailsScreen(
+    navigationManager: NavigationManager,
+    viewModel: MealDetailsViewModel,
+) {
+    // TODO Move implementation details to utility file `IntentUtils`
+    fun onLinkClick(uriString: String, context: Context) {
+        val uri = Uri.parse(uriString)
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        startActivity(context, intent, null)
+    }
+
+    val context = LocalContext.current
+
+    MealDetailsScreen(
+        meal = viewModel.mealDetails.collectAsState().value,
+        onBackButtonClick = navigationManager::navigateUp,
+        onYoutubeClick = { onLinkClick(it, context) },
+        onSourceClick = { onLinkClick(it, context) },
+    )
+}
 
 @Composable
 fun MealDetailsScreen(
@@ -234,7 +264,7 @@ private fun LazyListScope.ingredients(meal: MealDetailsModel) {
     }
 
     items(
-        key = { it },
+        key = { it.name },
         items = meal.ingredients
     ) {
         IngredientItem(

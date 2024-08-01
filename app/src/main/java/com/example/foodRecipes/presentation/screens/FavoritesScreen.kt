@@ -13,9 +13,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.foodRecipes.R
 import com.example.foodRecipes.domain.model.MealDetailsModel
+import com.example.foodRecipes.presentation.navigation.NavigationDestination
+import com.example.foodRecipes.presentation.navigation.NavigationManager
 import com.example.foodRecipes.presentation.theme.components.MealDetailsList
 import com.inconceptlabs.designsystem.components.core.Text
 import com.inconceptlabs.designsystem.theme.AppTheme
+
+@Composable
+fun FavoritesScreen(
+//    navigationManager: NavigationManager,
+) {
+    FavoritesScreen(
+        meals = emptyList(),
+        onMealClick = {
+            val destination = NavigationDestination.MealDetails(mealDetailsModel = it)
+//            navigationManager.navigate(destination)
+        }
+    )
+}
 
 @Composable
 fun FavoritesScreen(

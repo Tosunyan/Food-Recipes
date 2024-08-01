@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class HomeFragmentViewModel(
+class HomeViewModel(
     private val getCategories: GetCategories = GetCategories,
     private val getRegions: GetRegions = GetRegions,
     private val homeRepository: HomeRepository = HomeRepository()

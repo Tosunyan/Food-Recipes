@@ -1,15 +1,12 @@
 package com.example.foodRecipes.presentation.viewmodel
 
-import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodRecipes.datasource.remote.api.onSuccess
 import com.example.foodRecipes.datasource.repository.MealDetailsRepository
 import com.example.foodRecipes.domain.mapper.toMealDetailsModel
 import com.example.foodRecipes.domain.model.MealDetailsModel
-import com.example.foodRecipes.domain.model.MealModel
-import com.example.foodRecipes.presentation.fragment.MealDetailsFragment.Companion.ARG_MEAL_DETAILS_MODEL
-import com.example.foodRecipes.presentation.fragment.MealDetailsFragment.Companion.ARG_MEAL_MODEL
+import com.example.foodRecipes.presentation.navigation.NavigationDestination
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,16 +21,16 @@ class MealDetailsViewModel(
     private val _mealDetails = MutableStateFlow(MealDetailsModel())
     val mealDetails = _mealDetails.asStateFlow()
 
-    fun onArgumentsReceive(arguments: Bundle) {
+    fun onArgumentsReceive(destination: NavigationDestination.MealDetails) {
         when {
-            arguments.containsKey(ARG_MEAL_DETAILS_MODEL) -> {
-                arguments.getMealDetailsModel()
-                    ?.let(::setMealDetails)
+            destination.mealDetailsModel != null -> {
+                destination.mealDetailsModel
+                    .let(::setMealDetails)
             }
-            arguments.containsKey(ARG_MEAL_MODEL) -> {
-                arguments.getMealModel()
-                    ?.toMealDetailsModel()
-                    ?.let {
+            destination.mealModel != null -> {
+                destination.mealModel
+                    .toMealDetailsModel()
+                    .also {
                         setMealDetails(it)
                         getMealDetailsFromApi(it.id)
                     }
@@ -55,13 +52,5 @@ class MealDetailsViewModel(
                 .getMealDetails(id)
                 .onSuccess { _mealDetails.update { toMealDetailsModel() } }
         }
-    }
-
-    private fun Bundle.getMealDetailsModel(): MealDetailsModel? {
-        return getParcelable(ARG_MEAL_DETAILS_MODEL)
-    }
-
-    private fun Bundle.getMealModel(): MealModel? {
-        return getParcelable(ARG_MEAL_MODEL)
     }
 }

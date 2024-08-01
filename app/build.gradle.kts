@@ -4,6 +4,8 @@ plugins {
     id("kotlin-android")
     id("kotlin-parcelize")
     id("kotlin-kapt")
+
+    kotlin("plugin.serialization") version "1.9.24"
 }
 
 android {
@@ -21,6 +23,10 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            isDebuggable = true
+        }
+
         getByName("release") {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -56,12 +62,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1")
 
-    // Material Design
-    implementation("com.google.android.material:material:1.6.1")
-
-    // Fragment KTX
-    implementation("androidx.fragment:fragment-ktx:1.5.2")
-
     // Navigation
     implementation(project(":navigation"))
 
@@ -78,6 +78,9 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.1.0")
 
+    // KotlinX Serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
     // Jetpack Compose
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)
@@ -85,6 +88,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.github.inconcept:android-design-system:1.0.0")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
