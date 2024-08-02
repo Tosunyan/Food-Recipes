@@ -3,11 +3,32 @@ package com.example.foodRecipes.presentation.screens
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.foodRecipes.domain.model.MealModel
+import com.example.foodRecipes.presentation.navigation.NavigationDestination
+import com.example.foodRecipes.presentation.navigation.NavigationManager
 import com.example.foodRecipes.presentation.theme.components.MealsList
 import com.example.foodRecipes.presentation.theme.components.Toolbar
+import com.example.foodRecipes.presentation.viewmodel.MealsViewModel
+
+@Composable
+fun MealsScreen(
+    navigationManager: NavigationManager,
+    viewModel: MealsViewModel,
+) {
+    MealsScreen(
+        isLoading = viewModel.isLoading.collectAsState().value,
+        title = viewModel.title.collectAsState().value,
+        meals = viewModel.meals.collectAsState().value,
+        onBackClick = navigationManager::navigateUp,
+        onMealClick = {
+            val destination = NavigationDestination.MealDetails(mealModel = it)
+            navigationManager.navigate(destination)
+        }
+    )
+}
 
 @Composable
 fun MealsScreen(

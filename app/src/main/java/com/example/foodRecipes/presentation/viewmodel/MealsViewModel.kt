@@ -1,19 +1,16 @@
 package com.example.foodRecipes.presentation.viewmodel
 
-import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.foodRecipes.datasource.remote.api.onSuccess
 import com.example.foodRecipes.datasource.repository.MealRepository
 import com.example.foodRecipes.domain.model.MealModel
-import com.example.foodRecipes.presentation.fragment.MealsFragment.Action
-import com.example.foodRecipes.presentation.fragment.MealsFragment.Companion.ARG_ACTION
-import com.example.foodRecipes.presentation.fragment.MealsFragment.Companion.ARG_TITLE
+import com.example.foodRecipes.presentation.navigation.NavigationDestination.Meals
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class MealsFragmentViewModel(
+class MealsViewModel(
     private val mealRepository: MealRepository = MealRepository(),
 ): ViewModel() {
 
@@ -30,10 +27,10 @@ class MealsFragmentViewModel(
         showLoading()
     }
 
-    fun onArgumentsReceive(arguments: Bundle) {
-        _title.value = arguments.getString(ARG_TITLE)!!
+    fun onArgumentsReceive(meals: Meals) {
+        _title.value = meals.title
 
-        when (arguments.getSerializable(ARG_ACTION)) {
+        when (meals.action) {
             Action.CATEGORY -> filterMealsByCategory()
             Action.AREA -> filterMealsByArea()
         }
@@ -65,4 +62,9 @@ class MealsFragmentViewModel(
             }
         }
     }
+}
+
+enum class Action {
+    CATEGORY,
+    AREA
 }

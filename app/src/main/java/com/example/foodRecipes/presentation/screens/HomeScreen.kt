@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,13 +20,47 @@ import com.example.foodRecipes.R
 import com.example.foodRecipes.domain.model.CategoryModel
 import com.example.foodRecipes.domain.model.MealDetailsModel
 import com.example.foodRecipes.domain.model.RegionModel
+import com.example.foodRecipes.presentation.navigation.NavigationDestination
+import com.example.foodRecipes.presentation.navigation.NavigationManager
 import com.example.foodRecipes.presentation.theme.components.DailySpecialItem
 import com.example.foodRecipes.presentation.theme.components.listitem.CategoryItem
 import com.example.foodRecipes.presentation.theme.components.listitem.RegionItem
+import com.example.foodRecipes.presentation.viewmodel.Action
+import com.example.foodRecipes.presentation.viewmodel.HomeViewModel
 import com.inconceptlabs.designsystem.components.core.Text
 import com.inconceptlabs.designsystem.theme.AppTheme
 
 private const val SPAN_COUNT = 3
+
+@Composable
+fun HomeScreen(
+    navigationManager: NavigationManager,
+    viewModel: HomeViewModel,
+) {
+    HomeScreen(
+        dailySpecial = viewModel.randomMeal.collectAsState().value,
+        categories = viewModel.categories.collectAsState().value,
+        regions = viewModel.regions.collectAsState().value,
+        onDailySpecialClick = {
+            val destination = NavigationDestination.MealDetails(mealDetailsModel = it)
+            navigationManager.navigate(destination)
+        },
+        onCategoryItemClick = {
+            val destination = NavigationDestination.Meals(
+                title = it.name,
+                action = Action.CATEGORY
+            )
+            navigationManager.navigate(destination)
+        },
+        onRegionItemClick = {
+            val destination = NavigationDestination.Meals(
+                title = it.name,
+                action = Action.AREA
+            )
+            navigationManager.navigate(destination)
+        }
+    )
+}
 
 @Composable
 fun HomeScreen(
