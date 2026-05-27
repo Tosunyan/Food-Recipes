@@ -6,6 +6,10 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 android {
     namespace = "com.tosunyan.foodrecipes.network"
     compileSdk = 36
@@ -14,25 +18,26 @@ android {
         minSdk = 26
 
         val properties = gradleLocalProperties(rootDir, providers)
+
+        fun getProperty(key: String): String {
+            return System.getenv(key) ?: properties.getProperty(key) ?: ""
+        }
+
         buildConfigField(
             type = "String",
-            name = "MEAL_API_BASE_URL",
-            value = properties.getProperty("MEAL_API_URL")
+            name = "MEAL_API_URL",
+            value = getProperty("MEAL_API_URL")
         )
         buildConfigField(
             type = "String",
             name = "MEAL_API_KEY",
-            value = properties.getProperty("MEAL_API_KEY")
+            value = getProperty("MEAL_API_KEY")
         )
     }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    kotlinOptions {
-        jvmTarget = "21"
     }
 
     buildFeatures {

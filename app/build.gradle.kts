@@ -10,8 +10,16 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 android {
-    var properties = gradleLocalProperties(rootDir, providers)
+    var properties: Properties = gradleLocalProperties(rootDir, providers)
+
+    fun getProperty(key: String): String {
+        return System.getenv(key) ?: properties.getProperty(key) ?: ""
+    }
 
     compileSdk = 36
 
@@ -20,7 +28,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "0.3"
+        versionName = "1.0.0-snapshot01"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -28,20 +36,21 @@ android {
     signingConfigs {
         getByName("debug") {
             storeFile = file("$rootDir/debug.keystore")
-            storePassword = properties.getProperty("STORE_PASSWORD")
-            keyAlias = properties.getProperty("KEY_ALIAS")
-            keyPassword = properties.getProperty("STORE_PASSWORD")
+            storePassword = getProperty("STORE_PASSWORD")
+            keyAlias = getProperty("KEY_ALIAS")
+            keyPassword = getProperty("KEY_PASSWORD")
         }
 
         create("release") {
-            properties = Properties().apply {
-                load(rootProject.file("prod.properties").inputStream())
+            val prodFile = rootProject.file("prod.properties")
+            if (prodFile.exists()) {
+                properties = Properties().apply { prodFile.inputStream().use { load(it) } }
             }
 
             storeFile = file("$rootDir/release.keystore")
-            storePassword = properties.getProperty("STORE_PASSWORD")
-            keyAlias = properties.getProperty("KEY_ALIAS")
-            keyPassword = properties.getProperty("STORE_PASSWORD")
+            storePassword = getProperty("STORE_PASSWORD")
+            keyAlias = getProperty("KEY_ALIAS")
+            keyPassword = getProperty("KEY_PASSWORD")
         }
     }
 
@@ -67,10 +76,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    kotlinOptions {
-        jvmTarget = "21"
     }
 
     buildFeatures {
